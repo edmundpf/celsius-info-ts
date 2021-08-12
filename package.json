@@ -1,7 +1,7 @@
 {
   "name": "celsius-info-ts",
   "version": "1.0.0",
-  "description": "Celsius Wallet Info using read-only partner key",
+  "description": "Celsius Wallet Info using read-only Partner Key and API Key",
   "main": "./dist/index.js",
   "files": [
     "/dist"

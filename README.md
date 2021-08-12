@@ -1,5 +1,5 @@
 # celsius-info-ts
-> Celsius Wallet Info using read-only partner key and API Key
+> Celsius Wallet Info using read-only Partner Key and API Key
 
 ## Install
 ``` bash
