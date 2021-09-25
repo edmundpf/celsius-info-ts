@@ -4,17 +4,25 @@ import { Celsius, AUTH_METHODS, ENVIRONMENT } from 'celsius-sdk'
 import {
 	defaultStatsRecord,
 	coinMarketCapInfo,
+	defaultTransactionRecord,
+	CHAIN_NAMES,
 } from './values'
+import {
+	getTicker,
+	getDebitFromType,
+	getInverse,
+	getPrice,
+	getBaseNumbers,
+} from './transaction'
 import {
 	Await,
 	NumericDict,
 	ActionDict,
 	TransactionArgs,
-	HistoryRecord,
+	TransactionRecord,
 	Stats,
 	DriverArgs,
 } from './types'
-
 
 // Init
 
@@ -22,8 +30,8 @@ dotenv.config()
 
 // Constants
 
-const API_KEY = process.env.API_KEY || ''
-const PARTNER_KEY = process.env.PARTNER_KEY || ''
+const API_KEY = process.env.CELSIUS_API_KEY || ''
+const PARTNER_KEY = process.env.CELSIUS_PARTNER_KEY || ''
 const COIN_MARKET_CAP_KEY = process.env.COIN_MARKET_CAP_KEY || ''
 const PAGE_SIZE = 50
 
@@ -41,7 +49,7 @@ export default class CelsiusInfo {
 		tokens: {}
 	}
 	balances: ActionDict = {}
-	transactions: HistoryRecord[] = []
+	transactions: TransactionRecord[] = []
 
 	/**
 	 * Driver
@@ -174,41 +182,44 @@ export default class CelsiusInfo {
 				const aliases: any = {
 					withdrawal: 'send',
 					deposit: 'receive',
-					referal_award: 'award',
+					referrer_award: 'receive',
+					referred_award: 'receive',
 				}
-				const history: HistoryRecord[] = []
+				const history: TransactionRecord[] = []
 				for (const record of newTransactions) {
 					const {
 						id: internalId,
-						tx_id: cryptoId,
-						amount_usd: amountUsd,
-						amount_precise: tokenQuantity,
-						coin,
-						nature,
+						tx_id: transHash,
+						amount_usd: valUSD,
+						amount_precise: qty,
+						coin: quoteSymbol,
+						nature: transType,
 						time,
 					} = record
 					const id = internalId || ''
-					const transId = cryptoId || undefined
-					const base = 'USD'
-					const ticker = `${coin}-${base}`
-					const type = aliases[nature] || nature
-					const isCredit = type != 'send' ? true : false
-					const direction = isCredit ? 'credit' : 'debit'
-					const amount = isCredit ? Number(amountUsd) : Number(amountUsd) * -1
-					const quantity = Number(tokenQuantity)
-					const price = Math.abs(amount / quantity)
+					const transactionHash = transHash || ''
+					const blockchain = CHAIN_NAMES[quoteSymbol] || 'eth'
+					const baseSymbol = 'USD'
+					const ticker = getTicker(quoteSymbol, baseSymbol)
+					const type = aliases[transType] || transType
+					const quoteValueUSD = Number(valUSD)
+					const quoteQuantity = Number(qty)
+					const quotePriceUSD = getPrice(quoteValueUSD, quoteQuantity)
+					const { baseQuantity, baseValueUSD } = getBaseNumbers(quoteValueUSD)
 					history.push({
+						...defaultTransactionRecord,
 						id,
-						date: time,
+						time,
+						quoteSymbol,
 						ticker,
-						quote: coin,
-						base,
 						type,
-						direction,
-						quantity,
-						amount,
-						price,
-						transactionId: transId,
+						quoteQuantity,
+						quoteValueUSD,
+						quotePriceUSD,
+						baseQuantity,
+						baseValueUSD,
+						blockchain,
+						transactionHash
 					})
 				}
 				this.transactions = history

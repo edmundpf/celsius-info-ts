@@ -1,5 +1,5 @@
 import { Celsius } from 'celsius-sdk';
-import { Await, ActionDict, TransactionArgs, HistoryRecord, Stats, DriverArgs } from './types';
+import { Await, ActionDict, TransactionArgs, TransactionRecord, Stats, DriverArgs } from './types';
 /**
  * CelsiusInfo Class
  */
@@ -7,7 +7,7 @@ export default class CelsiusInfo {
     sdk?: Await<ReturnType<typeof Celsius>>;
     stats: Stats;
     balances: ActionDict;
-    transactions: HistoryRecord[];
+    transactions: TransactionRecord[];
     /**
      * Driver
      */

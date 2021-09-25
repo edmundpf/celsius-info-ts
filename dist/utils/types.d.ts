@@ -32,22 +32,29 @@ export declare type CelsiusTransactionType = CelsiusTransactionRecord & {
     id?: string;
 };
 /**
- * History Record
+ * Transaction Record
  */
-export declare type HistoryRecord = {
+export declare type TransactionRecord = {
     id: string;
-    date: string;
+    time: string;
+    quoteSymbol: string;
+    baseSymbol: string;
+    feeSymbol: string;
     ticker: string;
-    quote: string;
-    base: string;
-    type: string;
-    direction: string;
-    quantity: number;
-    amount: number;
-    price: number;
-    fromAddress?: string;
-    toAddress?: string;
-    transactionId?: string;
+    type: 'receive' | 'send' | 'interest';
+    quoteQuantity: number;
+    quoteValueUSD: number;
+    quotePriceUSD: number;
+    baseQuantity: number;
+    baseValueUSD: number;
+    basePriceUSD: number;
+    feeQuantity: number;
+    feeValueUSD: number;
+    feePriceUSD: number;
+    blockchain: 'btc' | 'eth';
+    fromAddress: string;
+    toAddress: string;
+    transactionHash: string;
 };
 /**
  * Stats Record Type

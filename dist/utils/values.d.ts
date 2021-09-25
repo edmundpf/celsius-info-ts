@@ -1,4 +1,4 @@
-import { StatsRecord } from './types';
+import { StatsRecord, TransactionRecord } from './types';
 /**
  * Default Stats
  */
@@ -11,3 +11,11 @@ export declare const coinMarketCapInfo: {
     quotes: string;
     authHeader: string;
 };
+/**
+ * Default Transaction
+ */
+export declare const defaultTransactionRecord: TransactionRecord;
+/**
+ * Chain Names
+ */
+export declare const CHAIN_NAMES: any;

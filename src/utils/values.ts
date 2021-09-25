@@ -1,6 +1,7 @@
 import {
 	StatsRecord,
 	Action,
+	TransactionRecord,
 } from './types'
 
 /**
@@ -26,3 +27,37 @@ export const coinMarketCapInfo = {
 	authHeader: 'X-CMC_PRO_API_KEY'
 }
 
+/**
+ * Default Transaction
+ */
+
+export const defaultTransactionRecord: TransactionRecord = {
+	id: '',
+	time: '',
+	quoteSymbol: '',
+	baseSymbol: 'USD',
+	feeSymbol: 'USD',
+	ticker: '',
+	type: 'interest',
+	quoteQuantity: 0,
+	quoteValueUSD: 0,
+	quotePriceUSD: 0,
+	baseQuantity: 0,
+	baseValueUSD: 0,
+	basePriceUSD: 1,
+	feeQuantity: 0,
+	feeValueUSD: 0,
+	feePriceUSD: 1,
+	blockchain: 'eth',
+	fromAddress: '',
+	toAddress: '',
+	transactionHash: '',
+}
+
+/**
+ * Chain Names
+ */
+
+export const CHAIN_NAMES: any = {
+	BTC: 'btc'
+}

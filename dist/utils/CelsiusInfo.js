@@ -16,11 +16,12 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const axios_1 = __importDefault(require("axios"));
 const celsius_sdk_1 = require("celsius-sdk");
 const values_1 = require("./values");
+const transaction_1 = require("./transaction");
 // Init
 dotenv_1.default.config();
 // Constants
-const API_KEY = process.env.API_KEY || '';
-const PARTNER_KEY = process.env.PARTNER_KEY || '';
+const API_KEY = process.env.CELSIUS_API_KEY || '';
+const PARTNER_KEY = process.env.CELSIUS_PARTNER_KEY || '';
 const COIN_MARKET_CAP_KEY = process.env.COIN_MARKET_CAP_KEY || '';
 const PAGE_SIZE = 50;
 /**
@@ -157,34 +158,34 @@ class CelsiusInfo {
                     const aliases = {
                         withdrawal: 'send',
                         deposit: 'receive',
-                        referal_award: 'award',
+                        referrer_award: 'receive',
+                        referred_award: 'receive',
                     };
                     const history = [];
                     for (const record of newTransactions) {
-                        const { id: internalId, tx_id: cryptoId, amount_usd: amountUsd, amount_precise: tokenQuantity, coin, nature, time, } = record;
+                        const { id: internalId, tx_id: transHash, amount_usd: valUSD, amount_precise: qty, coin: quoteSymbol, nature: transType, time, } = record;
                         const id = internalId || '';
-                        const transId = cryptoId || undefined;
-                        const base = 'USD';
-                        const ticker = `${coin}-${base}`;
-                        const type = aliases[nature] || nature;
-                        const isCredit = type != 'send' ? true : false;
-                        const direction = isCredit ? 'credit' : 'debit';
-                        const amount = isCredit ? Number(amountUsd) : Number(amountUsd) * -1;
-                        const quantity = Number(tokenQuantity);
-                        const price = Math.abs(amount / quantity);
-                        history.push({
-                            id,
-                            date: time,
+                        const transactionHash = transHash || '';
+                        const blockchain = values_1.CHAIN_NAMES[quoteSymbol] || 'eth';
+                        const baseSymbol = 'USD';
+                        const ticker = transaction_1.getTicker(quoteSymbol, baseSymbol);
+                        const type = aliases[transType] || transType;
+                        const quoteValueUSD = Number(valUSD);
+                        const quoteQuantity = Number(qty);
+                        const quotePriceUSD = transaction_1.getPrice(quoteValueUSD, quoteQuantity);
+                        const { baseQuantity, baseValueUSD } = transaction_1.getBaseNumbers(quoteValueUSD);
+                        history.push(Object.assign(Object.assign({}, values_1.defaultTransactionRecord), { id,
+                            time,
+                            quoteSymbol,
                             ticker,
-                            quote: coin,
-                            base,
                             type,
-                            direction,
-                            quantity,
-                            amount,
-                            price,
-                            transactionId: transId,
-                        });
+                            quoteQuantity,
+                            quoteValueUSD,
+                            quotePriceUSD,
+                            baseQuantity,
+                            baseValueUSD,
+                            blockchain,
+                            transactionHash }));
                     }
                     this.transactions = history;
                 }
